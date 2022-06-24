@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>テトリス</title>
+    <style>
+        body {
+            background: #ddf5ff;
+        }
+
+        #container {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+    <div id="container">
+        <canvas id="cvs"></canvas>
+    </div>
+    <script>
+        //ブロック1マスの大きさ
+        const blockSize = 30;
+        //ボードサイズ
+        const boardRow = 20;
+        const boardCol = 10;
+        //キャンバスの取得
+        const cvs = document.getElementById("cvs");
+        //2dコンテキストを取得
+        const ctx = cvs.getContext("2d");
+        //キャンバスサイズ
+        const canvasW = blockSize * boardCol;
+        const canvasH = blockSize * boardRow;
+        cvs.width = canvasW;
+        cvs.height = canvasH;
+        //コンテナの設定
+        const container = document.getElementById("container");
+        container.style.width = canvasW + 'px';
+
+        const tetSize = 4;
+        let tet = [
+            [0, 0, 0, 0],
+            [0, 1, 0, 0],
+            [1, 1, 1, 0],
+            [0, 0, 0, 0],
+        ];
+
+        let offsetX = 0;
+        let offsetY = 0;
+        const board = [];
+
+
+
+
+        //描画処理
+        const draw = () => {
+            //塗りに黒を設定
+            ctx.fillStyle = '#000';
+            //キャンバスを塗りつぶす
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            for (let y = 0; y < boardRow; y++) {
+                for (let x = 0; x < boardCol; x++) {
+                    if (board[y][x]) {
+                        drawBlock(x, y);
+                    }
+                }
+            }
+
+            //塗りに赤を設定
+            // ctx.fillStyle="#f00";
+            //x座標150,y座標150の場所に幅30,縦30の四角を描画
+            //ctx.fillRect(150,150,blockSize,blockSize);
+
+            for (let y = 0; y < tetSize; y++) {
+                for (let x = 0; x < tetSize; x++) {
+                    //もし、1だったら
+                    if (tet[y][x]) {
+                        drawBlock(offsetX + x, offsetY + y);
+                    }
+                }
+            }
+        }
+        const drawBlock = (x, y) => {
+            let px = x * blockSize;
+            let py = y * blockSize;
+            //塗りを設定
+            ctx.fillStyle = '#f00';
+            ctx.fillRect(px, py, blockSize, blockSize);
+            //線を設定
+            ctx.strokeStyle = 'black';
+            //線を描画
+            ctx.strokeRect(px, py, blockSize, blockSize);
+        }
+
+        const canMove = (dx, dy) =>{
+            for (let y = 0; y < tetSize; y++) {
+                for (let x = 0; x < tetSize; x++) {
+                    if(tet[y][x]){
+                        let nx=offsetX+x+dx;
+                        let ny=offsetY+y+dy;
+                        if(ny<0||nx<0||ny>=boardRow||nx>=boardCol||board[ny][nx]){
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        document.onkeydown = (e) => {
+            switch (e.keyCode) {
+                case 37:
+                     if (canMove(-1, 0)) offsetX--;
+                    break;
+                case 38:
+                    if (canMove(0, -1)) offsetY--;
+                    break;
+                case 39:
+                    if (canMove(1,0)) offsetX++;
+                    break;
+                case 40:
+                    if (canMove(0, 1)) offsetY++;
+                    break;
+
+            }
+            draw();
+        }
+
+        //初期化処理
+        const init = () => {
+            for (let y = 0; y < boardRow; y++) {
+                board[y] = [];
+                for (let x = 0; x < boardRow; x++) {
+                    board[y][x] = 0;
+                }
+            }
+            board[3][5] = 1;
+            draw();
+        }
+    </script>
+</body>
+
+</html>
